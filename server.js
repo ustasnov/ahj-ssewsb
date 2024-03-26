@@ -3,6 +3,8 @@
 const http = require("http");
 const Koa = require("koa");
 const koaBody = require("koa-body");
+const WS = require("ws");
+
 const app = new Koa();
 const router = require("./routes");
 
@@ -34,6 +36,22 @@ app.use((ctx, next) => {
 app.use(router());
 
 const server = http.createServer(app.callback());
+
+const wsServer = new WS.Server({
+  server,
+});
+
+wsServer.on("connection", (ws) => {
+  ws.on("message", (message) => {
+    console.log([...wsServer.clients]);
+    const data = JSON.parse(message);
+    if (data.command === "login") {
+      console.log(`command: ${data.command}, alias: ${data.name}`);
+      const res = JSON.stringify({ result: 1 });
+      ws.send(res);
+    }
+  });
+});
 
 const port = 7070;
 server.listen(port, (err) => {
