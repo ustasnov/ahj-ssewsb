@@ -8,6 +8,9 @@ const WS = require("ws");
 const app = new Koa();
 const router = require("./routes");
 
+const users = [];
+const chat = [];
+
 app.use(
   koaBody({
     urlencoded: true,
@@ -43,12 +46,35 @@ const wsServer = new WS.Server({
 
 wsServer.on("connection", (ws) => {
   ws.on("message", (message) => {
-    console.log([...wsServer.clients]);
+    //console.log([...wsServer.clients]);
     const data = JSON.parse(message);
-    if (data.command === "login") {
-      console.log(`command: ${data.command}, alias: ${data.name}`);
-      const res = JSON.stringify({ result: 1 });
-      ws.send(res);
+    console.log(`command: ${data.command}, data: ${data.data}`);
+    switch (data.command) {
+      case "login":
+        if (users.indexOf(data.data) === -1) {
+          users.push(data.data);
+          data.result = 0;
+          console.log(`register in chat user: ${data.data}`);
+        } else {
+          data.result = 1;
+          console.log(`user: ${data.data} already registered in chat`);
+        }
+
+        const res = JSON.stringify(data);
+        ws.send(res);
+
+        break;
+      case "post":
+        const {user, message} = data.data;
+        chat.push({user: user, message: message });
+
+        Array.from(wsServer.clients).forEach((ws) => {
+          ws.send(JSON.stringify({command: "chat", data: chat}));   
+        });
+
+        break;
+      default:
+        break;
     }
   });
 });
