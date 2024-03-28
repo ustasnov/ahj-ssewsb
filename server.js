@@ -50,7 +50,7 @@ wsServer.on("connection", (ws) => {
     const data = JSON.parse(message);
     console.log(`command: ${data.command}, data: ${data.data}`);
     switch (data.command) {
-      case "login":
+      case "login": {
         if (users.indexOf(data.data) === -1) {
           users.push(data.data);
           data.result = 0;
@@ -64,15 +64,17 @@ wsServer.on("connection", (ws) => {
         ws.send(res);
 
         break;
-      case "post":
-        const {user, message} = data.data;
-        chat.push({user: user, message: message });
+      }
+      case "post": {
+        const { user, message } = data.data;
+        chat.push({ user: user, message: message });
 
         Array.from(wsServer.clients).forEach((ws) => {
-          ws.send(JSON.stringify({command: "chat", data: chat}));   
+          ws.send(JSON.stringify({ command: "chat", data: chat }));
         });
 
         break;
+      }
       default:
         break;
     }
