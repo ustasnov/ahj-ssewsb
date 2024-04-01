@@ -19,8 +19,6 @@ wsServer.on("connection", (ws) => {
   });
 });
 
-//const port = 7070;
-//const port = 10000;
 const port = process.env.PORT || 7070;
 server.listen(port, (err) => {
   if (err) {
