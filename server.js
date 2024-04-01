@@ -19,6 +19,7 @@ wsServer.on("connection", (ws) => {
   });
 });
 
+//const port = 7070;
 const port = 10000;
 server.listen(port, (err) => {
   if (err) {
